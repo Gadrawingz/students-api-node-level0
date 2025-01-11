@@ -63,30 +63,48 @@ app.get("/students/:id", (req, res) => {
   const sql = "SELECT * FROM students WHERE id=?";
   db.query(sql, [id], (err, results) => {
     if (err) throw err;
+
+    if (results.length === 0) {
+      return res.status(404).send(`User with ${id} not found!`);
+    }
+
     res.send(results);
   });
 });
 
-// 06:GET:http://localhost:3005/student/:id
+// 06:PUT:http://localhost:3005/student/:id
 // Update a student
 app.put("/students/:id", (req, res) => {
   const { id } = req.params;
-  const { username, firstname, lastname, email, gender, telephone } =
-    req.params;
+  const { username, firstname, lastname, email, gender, telephone } = req.body;
 
   const sql =
-    "UPDATE students SET username=?, firstname=?, lastname=?, email=?, gender=?, telephone=? WHERE id=?";
+    "UPDATE students SET username= ?, firstname= ?, lastname= ?, email= ?, gender= ?, telephone= ? WHERE id= ?";
   db.query(
     sql,
     [username, firstname, lastname, email, gender, telephone, id],
     (err, result) => {
       if (err) throw err;
       if (result.affectedRows === 0) {
-        return res.status(404).send("User not found!");
+        return res.status(404).send("Stident not found!");
       }
-      res.send({ id, usename, firstname, lastname, email, gender, telephone });
+      res.send({ id, username, firstname, lastname, email, gender, telephone });
     }
   );
+});
+
+// 07:DELETE:http://localhost:3005/student/:id
+// Delete a student
+app.delete("/students/:id", (req, res) => {
+  const { id } = req.params;
+  const sql = "DELETE FROM students WHERE id=? ";
+  db.query(sql, [id], (err, result) => {
+    if (err) throw err;
+    if (result.affectedRows === 0) {
+      return res.status(404).send("Student with this id not found");
+    }
+    res.send("User Deleted");
+  });
 });
 
 app.listen(PORT, () => {
